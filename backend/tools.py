@@ -271,12 +271,41 @@ def check_reservation_availability(
 
 
 # ============================================================
+# TOOL 4: Search Restaurants by Dish
+# ============================================================
+
+def search_restaurants_by_dish(dish: str) -> list:
+    """
+    Find restaurants that serve a dish (matched against each
+    restaurant's specialities, e.g. "biryani", "pizza", "tacos").
+    """
+
+    query = dish.lower().strip()
+    if not query:
+        return []
+
+    found = []
+    for cuisine in ("Indian", "Italian", "Chinese", "Mexican"):
+        for r in search_restaurants_by_cuisine(cuisine):
+            details = get_restaurant_details(r["name"])
+            specialities = [
+                d.strip() for d in details.get("speciality", "").split(",")
+            ]
+            matches = [d for d in specialities if query in d.lower()]
+            if matches:
+                found.append({**r, "cuisine": cuisine, "dishes": matches})
+
+    return sorted(found, key=lambda r: -r["rating"])
+
+
+# ============================================================
 # Registry + Gemini function declarations
 # ============================================================
 
 TOOL_FUNCTIONS = {
     "search_restaurants_by_cuisine": search_restaurants_by_cuisine,
     "get_restaurant_details": get_restaurant_details,
+    "search_restaurants_by_dish": search_restaurants_by_dish,
     "check_reservation_availability": check_reservation_availability,
 }
 
@@ -307,6 +336,20 @@ TOOL_DECLARATIONS = [
                 "restaurant_name": {"type": "string", "description": "Exact restaurant name"}
             },
             "required": ["restaurant_name"],
+        },
+    },
+    {
+        "name": "search_restaurants_by_dish",
+        "description": (
+            "Find restaurants that serve a given dish, such as biryani, pizza "
+            "or tacos. Use this whenever the user asks where to eat a dish."
+        ),
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "dish": {"type": "string", "description": "Dish name, e.g. biryani"}
+            },
+            "required": ["dish"],
         },
     },
     {

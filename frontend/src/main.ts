@@ -89,6 +89,16 @@ function renderTool(t: ToolResult): HTMLElement {
       box.append(grid);
       break;
     }
+    case "search_restaurants_by_dish": {
+      if (!c.output.length) { box.append(el("div", "msg bot", "No restaurants serve that dish.")); break; }
+      for (const r of c.output) {
+        const card = el("div", "card");
+        card.append(el("h3", "", r.name), el("div", "meta", `${r.dishes.join(", ")}  ·  ${r.cuisine}`), el("div", "meta", `⭐ ${r.rating}  ·  ${r.price}`));
+        grid.append(card);
+      }
+      box.append(grid);
+      break;
+    }
     case "get_restaurant_details": {
       if ("error" in c.output) { box.append(el("div", "msg bot err", c.output.error)); break; }
       const card = el("div", "card");

@@ -33,6 +33,11 @@ export const ToolCall = z.discriminatedUnion("name", [
     output: jsonText(z.array(RestaurantSummary)),
   }),
   z.object({
+    name: z.literal("search_restaurants_by_dish"),
+    args: z.object({ dish: z.string() }),
+    output: jsonText(z.array(RestaurantSummary.extend({ cuisine: z.string(), dishes: z.array(z.string()) }))),
+  }),
+  z.object({
     name: z.literal("get_restaurant_details"),
     args: z.object({ restaurant_name: z.string() }),
     output: jsonText(z.union([RestaurantDetails, ToolError])),

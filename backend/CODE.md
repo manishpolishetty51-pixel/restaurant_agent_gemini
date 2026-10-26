@@ -2,7 +2,7 @@
 
 FastAPI backend with a single Gemini agent, calling the `google-genai` SDK directly (no LangChain or LangSmith). `POST /chat` takes `{message, history}` and returns `{source, reply, tool_calls}`, where each tool call is `{name, args, output}`.
 
-Tools (`tools.py`): search restaurants by cuisine, get restaurant details, check reservation availability. They are plain Python functions, registered in `TOOL_FUNCTIONS` and described to Gemini by `TOOL_DECLARATIONS`.
+Tools (`tools.py`): search restaurants by cuisine, search restaurants by dish, get restaurant details, check reservation availability. They are plain Python functions, registered in `TOOL_FUNCTIONS` and described to Gemini by `TOOL_DECLARATIONS`.
 
 Endpoints: `POST /chat` and `GET /health`. Run: `uvicorn main:app --reload`.
 
@@ -43,10 +43,15 @@ You are a helpful restaurant assistant.
 You have access to these tools:
 
 1. Search restaurants by cuisine
-2. Get restaurant details
-3. Check reservation availability
+2. Search restaurants by dish
+3. Get restaurant details
+4. Check reservation availability
 
 Use the appropriate tool whenever necessary.
+
+When the user asks about a dish (for example "where can I get biryani?"),
+call the dish search tool and list the restaurants that serve it, with the
+matching dishes. If none serve it, say so.
 
 Do not invent restaurant information.
 
